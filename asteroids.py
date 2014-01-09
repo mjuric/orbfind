@@ -2,11 +2,13 @@
 
 import math
 import ephem
+import sys
 import datetime as dt
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import vec2orbElem
+import utils
 
 rad_to_deg = 180.0/math.pi
 
@@ -35,7 +37,7 @@ def testWithMars():
         positions[i, 0] = float(m.ra) * rad_to_deg
         positions[i, 1] = float(m.dec) * rad_to_deg
 
-        print m.hlon, m.hlat
+        print m.hlon, m.hlat, m.ra, m.dec
 
         # Compute heliocentric position
         absolute_positions[i, 0] = m.sun_distance * np.cos(m.hlon)
@@ -44,7 +46,8 @@ def testWithMars():
 
     print absolute_positions   
 
-    #angular_velocity = getAngularVelocity(observations, positions)
+    ra_velocities, dec_velocities = getAngularVelocity(observations, positions)
+    
 
     #vec2orbElem(rs, vs, mus)
 
@@ -52,25 +55,43 @@ def testWithMars():
 def getAngularVelocity(observations, positions):
 
     delta_t = np.zeros(len(observations)/2)
-    separations = np.zeros(len(observations)/2)
+    separations = np.zeros((len(observations)/2, 2))
     angular_velocities = np.zeros(len(observations)/2)
 
     for i in range(1, len(observations), 2):
         delta_t[(i-1)/2] = (observations[i] - observations[i-1])
-        separations[(i-1)/2] = ephem.separation(positions[i], positions[i-1])
+        separations[(i-1)/2, 0] = positions[i, 0] - positions[i-1, 0]
+        separations[(i-1)/2, 1] = positions[i, 1] - positions[i-1, 1]
     print delta_t
     print separations
 
-    angular_velocities = np.divide(separations, delta_t)
-    print angular_velocities
+    ra_velocities = np.divide(separations[:, 0], delta_t)
+    dec_velocities = np.divide(separations[:, 1], delta_t)
+    print ra_velocities
+    print dec_velocities
     
     fig = plt.figure()
     observed_positions = fig.add_subplot(111)
     observed_positions.plot(positions[:, 0], positions[:, 1], 'bo')
     plt.show()
 
-    return angular_velocities
+    return ra_velocities, dec_velocities
+
+
+def displayFits(observations, positions, elements):
+    fig = plt.figure()
+    tracks = fig.add_subplot(111)
+    tracks.plot(positions[:, 0], positions[:, 1], 'bo')
+
+    time = np.arange(observations[0], observations[-1], 100)
+
+    #for body in elements:
+        
+
+
+def main(argv):
+    testWithMars()
 
 
 if __name__ == '__main__':
-    testWithMars()
+    main(sys.argv[1:])
