@@ -1,5 +1,6 @@
 import numpy
 from numpy import sin, cos
+import pdb
 
 def vec2orbElem(rs, vs, mus):
 # %vec2orbElem - Convert position and velocity vectors to orbital elements.
@@ -59,25 +60,25 @@ def vec2orbElem(rs, vs, mus):
     nplanets = rs.shape[1]
 
     v2s = numpy.sum(vs**2., axis=0)
-    r = numpy.sqrt(numpy.sum(rs**2.))
+    r = numpy.sqrt(numpy.sum(rs**2., axis=0))
     Ws = 0.5*v2s - mus/r
     a = -mus/2/Ws #semi-major axis
 
     L = numpy.array([rs[1,:]*vs[2,:] - rs[2,:]*vs[1,:],
                      rs[2,:]*vs[0,:] - rs[0,:]*vs[2,:],
                      rs[0,:]*vs[1,:] - rs[1,:]*vs[0,:]]) #angular momentum
-    L2s = numpy.sum(L**2.)
+    L2s = numpy.sum(L**2., axis=0)
     p = L2s/mus #semi-latus rectum
     e = numpy.sqrt(1 - p/a) #eccentricity
 
     #eccentric anomaly
     cosE = (1 - r/a)/e
-    sinE = numpy.sum(rs*vs)/(e*numpy.sqrt(mus*a))
+    sinE = numpy.sum(rs*vs, axis=0)/(e*numpy.sqrt(mus*a))
     E = numpy.arctan2(sinE,cosE)
 
     #inclination
     sinI = numpy.sqrt(L[0,:]**2. + L[1,:]**2.)/numpy.sqrt(L2s)
-    cosI = L[2,:]/numpy.sqrt(L2s)x
+    cosI = L[2,:]/numpy.sqrt(L2s)
     I = numpy.arctan2(sinI,cosI)
 
     #argument of pericenter
