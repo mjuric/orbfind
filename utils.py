@@ -1,7 +1,7 @@
 import math
 
 # Input Units: vx, vy, vz (km s^-1) : ra, dec (deg)
-# Output Units: deg s^-1 (???)
+# Output Units: km s^-1
 def vel2pm(vx, vy, vz, ra, dec):
     c_ra = math.cos(ra * math.pi/180)
     s_ra = math.sin(ra * math.pi/180)
@@ -15,7 +15,7 @@ def vel2pm(vx, vy, vz, ra, dec):
 
     return v_ra, v_dec, vr
 
-# Input Units: deg s^-1 (???)
+# Input Units: km s^-1
 # Output Units: km s^-1
 def pm2vel(v_ra, v_dec, vr, ra, dec):
     c_ra = math.cos(ra * math.pi/180);
